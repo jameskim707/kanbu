@@ -1,17 +1,8 @@
 """
-🤝 KANBU - AI 시대, 판단을 지켜주는 인생 코치
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-"무엇을 할지가 아니라, 지금 멈춰도 되는지를 함께 판단한다"
-S.R.A 2.0의 개인 레이어 인터페이스
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📌 KANBU 핵심 (정책 설명 / 발표용)
-"AI 시대에 가장 필요한 건 더 빠른 학습이 아니라,
-멈출 수 있는 판단력이다."
-
+🎨 깐부 KANBU - 현실적 따뜻함의 AI 코치
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 개발: Jameskim (기획/비전) + Miracle (구현)
-설계: Raira + Gemini + Perfect (리서치)
+디자인 감수: Raira + Gemini
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -24,103 +15,63 @@ import time
 # 🎨 컬러 & 스타일 설정
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 COLORS = {
-    "main": "#5C6BC0",      # 인디고 (메인 - 신뢰/안정)
-    "accent": "#7986CB",    # 연한 인디고
-    "dark": "#303F9F",      # 진한 인디고
-    "light": "#E8EAF6",     # 라이트 인디고
+    "main": "#FF8C42",      # 주황 (메인)
+    "accent": "#FFA500",    # 오렌지 (액센트)
+    "dark": "#2C2C2C",      # 다크
+    "light": "#F5F1E8",     # 라이트 베이지
     "white": "#FFFFFF",
-    "warm": "#FFF8E1",      # 따뜻한 배경
-    "text": "#2C2C2C",
-    "pause": "#FF7043",     # 멈춤 - 주황
-    "reflect": "#26A69A",   # 반영 - 틸
-    "slow": "#AB47BC",      # 감속 - 보라
+    "success": "#4CAF50",
+    "warning": "#FF6B6B",
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🧠 시스템 프롬프트 - KANBU의 영혼
+# 🧠 시스템 프롬프트 - 깐부의 영혼
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KANBU_SYSTEM_PROMPT = """
+당신은 '깐부'입니다. 사용자의 진정한 동반자이자 현실적인 코치입니다.
 
-# 1단: 고정 정체성 프롬프트
-KANBU_IDENTITY_PROMPT = """
-당신은 'KANBU'입니다.
-AI 시대에 '무엇을 할지'가 아니라 '지금 멈춰도 되는지'를 함께 판단하는 인생 코치입니다.
+## 🎯 핵심 정체성
+- 이름: 깐부 (KANBU)
+- 성격: 따뜻하지만 현실적, 공감하지만 솔직함
+- 역할: 인생의 동반자, 현실적 조언자, 따뜻한 코치
 
-## 🎯 KANBU의 정체성
-"AI 시대, 판단을 지켜주는 인생 코치"
+## 💬 대화 스타일
+1. **현실적 따뜻함**: 위로만 하지 않고, 진짜 도움이 되는 말을 함
+2. **직접적 소통**: 돌려말하지 않고 핵심을 말함
+3. **공감 + 행동**: 감정을 인정하되, 다음 행동을 제시함
+4. **존중하는 솔직함**: 쓴소리도 존중을 담아 전달함
 
-더 빠르게 배우라고 재촉하지 않습니다.
-더 많이 하라고 압박하지 않습니다.
-대신, 지금 이 순간 정말 필요한 것이 무엇인지 함께 점검합니다.
+## 🔥 대화 원칙
+- "힘들겠다"로 끝내지 말고 "그래서 뭘 할 수 있을까?" 로 이어가기
+- 막연한 격려 대신 구체적인 첫 걸음 제시하기
+- 사용자가 스스로 답을 찾도록 질문하기
+- 실패해도 괜찮다는 메시지 + 다시 시도할 방법 함께 주기
 
-## 🔥 KANBU가 해결하려는 문제
-- "다들 AI 공부하는데 나만 뒤처진 것 같아" → 비교에서 온 불안
-- "이직해야 할지 모르겠어" → 선택 압박
-- "뭘 믿어야 할지 모르겠어" → 정보 과잉
-- "뭔가 해야 할 것 같은데 뭘 해야 할지..." → 막연한 조급함
+## 📝 응답 형식
+- 이모지 적절히 사용 (과하지 않게)
+- 짧고 임팩트 있는 문장
+- 필요시 단계별 가이드 제공
+- 따뜻하지만 가볍지 않은 톤
 
-문제의 원인은 능력 부족이 아니라 '판단 과부하'입니다.
+## ⚠️ 절대 하지 않는 것
+- 무조건적인 긍정 ("넌 할 수 있어!"만 반복)
+- 판단하거나 비난하기
+- 전문 의료/법률 조언 (전문가 연결 권유)
+- 위험 상황 무시하기
 
-## 🛡️ KANBU의 핵심 원칙
-절대 하지 않는 것:
-- ❌ 인생 결론 내려주기
-- ❌ 성공/실패 판단하기
-- ❌ "이게 정답" 제시하기
-- ❌ 동기부여 과잉
-- ❌ 가속 유도
+## 🆘 위기 상황 대응
+사용자가 자해/자살 암시 시:
+1. 즉시 공감 표현
+2. 전문 상담 연결 권유 (자살예방상담전화 1393)
+3. 지금 할 수 있는 작은 안전 행동 제안
 
-대신 항상:
-- ⭕ 불안 신호 감지
-- ⭕ 생각 정리 질문
-- ⭕ 선택지 구조화
-- ⭕ "지금 멈춰도 되는지" 확인
-- ⭕ 감속 제안
+## 💡 깐부의 핵심 철학
+"사람에게 필요한 건 관심과 연결이야. 
+혼자 미친듯이 뛰려고 하지 마. 
+같이 뛰어줄 사람이 있으면 더 멀리 갈 수 있어."
 
-결정권은 항상 사용자에게 남겨둡니다.
-
-## 🔄 S.R.A 2.0과의 연결
-KANBU는 S.R.A 2.0의 '개인 레이어 전용 인터페이스'입니다.
-- 브레이크 시스템 → 불안에 휩쓸리지 않게 멈춤
-- 판단 정렬 → 생각·감정·현실 분리
-- 속도 조절 → 나만의 속도 찾기
-- 과잉 대응 차단 → 지금 행동이 필요한지 점검
-
-## 💡 핵심 메시지
-"AI 시대에 가장 필요한 건 더 빠른 학습이 아니라, 멈출 수 있는 판단력이다."
+지금부터 깐부로서 사용자와 대화를 시작하세요.
 """
-
-# 2단: 대화 가이드 프롬프트
-KANBU_GUIDE_PROMPT = """
-## 💬 대화 톤 & 태도 (매우 중요!)
-- 조언 ❌ → 질문 ⭕
-- 판단 ❌ → 반영 ⭕
-- 가속 ❌ → 감속 ⭕
-
-## 📝 응답 스타일
-- 따뜻하지만 차분한 톤
-- 열린 질문으로 생각 유도
-- 짧고 명확하게
-- 이모지 적절히 사용
-- 절대 재촉하지 않기
-
-## 🎯 핵심 질문 예시
-- "지금 당장 결정해야 할 상황일까요?"
-- "이 불안은 현실에서 온 걸까요, 비교에서 온 걸까요?"
-- "속도를 늦춰도 문제가 생길까요?"
-- "지금 가장 무거운 생각은 뭔가요?"
-- "만약 한 달 뒤에 결정해도 된다면, 지금 뭘 하고 싶으세요?"
-
-## 🆘 불안 폭증 시
-사용자가 심한 불안/조급함을 표현하면:
-1. 먼저 멈춤: "잠깐, 숨 한 번 쉬어볼까요?"
-2. 감정 분리: "지금 느끼는 게 '해야 한다'인가요, '하고 싶다'인가요?"
-3. 현실 점검: "지금 당장 안 하면 정말 문제가 생길까요?"
-4. 속도 제안: "오늘은 그냥 생각만 정리해도 충분해요."
-
-지금부터 KANBU로서 사용자의 판단 안정을 도와주세요.
-"""
-
-# 통합 프롬프트
-KANBU_SYSTEM_PROMPT = KANBU_IDENTITY_PROMPT + KANBU_GUIDE_PROMPT
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 🎨 CSS 스타일
@@ -130,89 +81,111 @@ def load_css():
     <style>
         /* 전체 배경 */
         .stApp {{
-            background: linear-gradient(180deg, {COLORS['light']} 0%, {COLORS['warm']} 100%);
+            background: linear-gradient(135deg, {COLORS['light']} 0%, #FFF8F0 100%);
         }}
         
-        /* 헤더 */
+        /* 헤더 스타일 */
         .kanbu-header {{
-            background: linear-gradient(135deg, {COLORS['main']} 0%, {COLORS['dark']} 100%);
+            background: linear-gradient(135deg, {COLORS['main']} 0%, {COLORS['accent']} 100%);
             padding: 2rem;
             border-radius: 20px;
             text-align: center;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(92, 107, 192, 0.3);
+            box-shadow: 0 10px 40px rgba(255, 140, 66, 0.3);
         }}
         
         .kanbu-title {{
             color: white;
             font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }}
         
         .kanbu-subtitle {{
             color: rgba(255,255,255,0.9);
             font-size: 1.1rem;
+            margin-top: 0.5rem;
         }}
         
-        /* 기능 카드 */
-        .function-card {{
+        /* 선택 카드 스타일 */
+        .choice-card {{
             background: white;
             border-radius: 16px;
             padding: 1.5rem;
-            margin: 0.5rem 0;
-            border-left: 4px solid {COLORS['light']};
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 0.8rem 0;
+            border-left: 5px solid {COLORS['main']};
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
             cursor: pointer;
         }}
         
-        .function-card:hover {{
-            border-left-color: {COLORS['main']};
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.15);
+        .choice-card:hover {{
+            transform: translateX(10px);
+            box-shadow: 0 6px 20px rgba(255, 140, 66, 0.2);
         }}
         
-        .function-icon {{
+        .choice-icon {{
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }}
         
-        .function-title {{
-            color: {COLORS['text']};
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
+        .choice-title {{
+            color: {COLORS['dark']};
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0.3rem 0;
         }}
         
-        .function-desc {{
+        .choice-desc {{
             color: #666;
             font-size: 0.9rem;
         }}
         
-        /* 철학 박스 */
-        .philosophy-box {{
-            background: linear-gradient(135deg, {COLORS['light']} 0%, white 100%);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            text-align: center;
-            border: 1px solid {COLORS['accent']};
+        /* 진행 상태 표시 */
+        .progress-container {{
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }}
         
-        .philosophy-text {{
+        .progress-step {{
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: {COLORS['light']};
             color: {COLORS['dark']};
-            font-size: 1.1rem;
-            font-style: italic;
-            line-height: 1.8;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }}
         
-        /* 채팅 메시지 */
+        .progress-step.active {{
+            background: {COLORS['main']};
+            color: white;
+        }}
+        
+        .progress-step.done {{
+            background: {COLORS['success']};
+            color: white;
+        }}
+        
+        /* 채팅 메시지 스타일 */
         .chat-message {{
             padding: 1rem 1.5rem;
             border-radius: 18px;
-            margin: 0.5rem 0;
+            margin: 0.8rem 0;
             max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }}
+        
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(10px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
         }}
         
         .user-message {{
@@ -222,11 +195,50 @@ def load_css():
             border-bottom-right-radius: 4px;
         }}
         
-        .assistant-message {{
+        .kanbu-message {{
             background: white;
-            color: {COLORS['text']};
-            border: 1px solid {COLORS['light']};
+            color: {COLORS['dark']};
+            border: 1px solid #eee;
             border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }}
+        
+        /* 인터랙티브 버튼 */
+        .kanbu-btn {{
+            background: linear-gradient(135deg, {COLORS['main']} 0%, {COLORS['accent']} 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }}
+        
+        .kanbu-btn:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+        }}
+        
+        /* 상태 뱃지 */
+        .status-badge {{
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }}
+        
+        .status-active {{
+            background: rgba(76, 175, 80, 0.1);
+            color: {COLORS['success']};
+        }}
+        
+        .status-waiting {{
+            background: rgba(255, 140, 66, 0.1);
+            color: {COLORS['main']};
         }}
         
         /* 입력창 스타일 */
@@ -239,12 +251,12 @@ def load_css():
         
         .stTextInput > div > div > input:focus {{
             border-color: {COLORS['main']} !important;
-            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.1) !important;
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1) !important;
         }}
         
         /* 사이드바 스타일 */
         section[data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, {COLORS['dark']} 0%, #1A237E 100%);
+            background: linear-gradient(180deg, {COLORS['dark']} 0%, #1a1a1a 100%);
         }}
         
         section[data-testid="stSidebar"] .stMarkdown {{
@@ -271,224 +283,177 @@ def load_css():
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def init_session_state():
     """세션 상태 초기화"""
-    if "mode_messages" not in st.session_state:
-        st.session_state.mode_messages = {
-            "anxiety": [],      # 불안 점검
-            "choice": [],       # 선택 정리
-            "pace": [],         # 속도 조절
-            "reflect": [],      # 생각 정리
-            "free": []          # 자유 대화
-        }
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
     if "current_mode" not in st.session_state:
         st.session_state.current_mode = "home"
+    if "user_name" not in st.session_state:
+        st.session_state.user_name = ""
     if "conversation_started" not in st.session_state:
         st.session_state.conversation_started = False
 
-def get_current_messages():
-    """현재 모드의 메시지 리스트 반환"""
-    mode = st.session_state.current_mode
-    if mode in st.session_state.mode_messages:
-        return st.session_state.mode_messages[mode]
-    return []
-
-def add_message(role, content):
-    """현재 모드에 메시지 추가"""
-    mode = st.session_state.current_mode
-    if mode in st.session_state.mode_messages:
-        st.session_state.mode_messages[mode].append({
-            "role": role,
-            "content": content
-        })
-
-def clear_current_messages():
-    """현재 모드의 메시지 초기화"""
-    mode = st.session_state.current_mode
-    if mode in st.session_state.mode_messages:
-        st.session_state.mode_messages[mode] = []
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🤖 Groq API 연결
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def get_groq_response(messages):
-    """Groq API를 통해 응답 생성"""
+    """Groq API를 통한 응답 생성"""
     try:
-        client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+        client = Groq(api_key=st.secrets.get("GROQ_API_KEY", ""))
         
-        system_message = {"role": "system", "content": KANBU_SYSTEM_PROMPT}
-        full_messages = [system_message] + messages
+        full_messages = [{"role": "system", "content": KANBU_SYSTEM_PROMPT}]
+        full_messages.extend(messages)
         
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-70b-versatile",
             messages=full_messages,
-            temperature=0.7,
+            temperature=0.8,
             max_tokens=1024,
         )
-        
         return response.choices[0].message.content
     except Exception as e:
-        return f"잠깐, 숨 고르는 시간이 필요해 보여요 🌱\n\n기술적인 연결이 잠시 끊겼어요. 조금만 쉬었다가 다시 이야기해볼까요?"
+        return f"⚠️ 연결에 문제가 생겼어요. 잠시 후 다시 시도해주세요.\n\n(오류: {str(e)})"
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🎨 UI 컴포넌트
+# 🏠 UI 컴포넌트
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def render_header():
     """헤더 렌더링"""
     st.markdown("""
     <div class="kanbu-header">
-        <div class="kanbu-title">🤝 KANBU</div>
-        <div class="kanbu-subtitle">AI 시대, 판단을 지켜주는 인생 코치</div>
+        <div class="kanbu-title">🤝 깐부 KANBU</div>
+        <div class="kanbu-subtitle">현실적 따뜻함으로 함께하는 AI 코치</div>
     </div>
     """, unsafe_allow_html=True)
 
-def render_function_cards():
-    """기능 카드 렌더링"""
-    functions = [
-        {
-            "icon": "😰",
-            "title": "불안 점검",
-            "desc": "이 불안, 현실일까 비교일까?",
-            "mode": "anxiety",
-            "first_msg": "😰 불안 점검 모드예요.\n\n요즘 마음이 불안하거나 조급한 게 있나요?\n비교에서 온 건지, 현실에서 온 건지 함께 살펴봐요."
-        },
-        {
-            "icon": "🔀",
-            "title": "선택 정리",
-            "desc": "결정 압박, 정리해볼까요?",
-            "mode": "choice",
-            "first_msg": "🔀 선택 정리 모드예요.\n\n지금 결정해야 할 것 같은 게 있나요?\n선택지를 정리하고, 지금 당장 결정해야 하는지 함께 점검해봐요."
-        },
-        {
-            "icon": "🐢",
-            "title": "속도 조절",
-            "desc": "지금, 멈춰도 괜찮을까?",
-            "mode": "pace",
-            "first_msg": "🐢 속도 조절 모드예요.\n\n뭔가 계속 해야 할 것 같은 느낌이 있나요?\n잠깐 멈추고, 나만의 속도를 찾아봐요."
-        },
-        {
-            "icon": "💭",
-            "title": "생각 정리",
-            "desc": "머릿속이 복잡할 때",
-            "mode": "reflect",
-            "first_msg": "💭 생각 정리 모드예요.\n\n머릿속이 복잡하거나 정리가 안 되는 게 있나요?\n생각을 하나씩 꺼내서 정리해봐요."
-        },
+def render_choice_cards():
+    """3단계 선택 카드 렌더링"""
+    choices = [
         {
             "icon": "💬",
-            "title": "자유 대화",
-            "desc": "그냥 이야기하고 싶을 때",
-            "mode": "free",
-            "first_msg": "💬 자유 대화 모드예요.\n\n특별한 주제 없이 그냥 이야기해도 좋아요.\n뭐든 편하게 말씀해주세요."
+            "title": "대화하기",
+            "desc": "지금 마음에 있는 이야기를 나눠보세요",
+            "mode": "chat"
+        },
+        {
+            "icon": "🎯",
+            "title": "목표 설정",
+            "desc": "이루고 싶은 것을 함께 정리해봐요",
+            "mode": "goal"
+        },
+        {
+            "icon": "📊",
+            "title": "상태 체크",
+            "desc": "오늘의 컨디션을 점검해볼까요?",
+            "mode": "check"
         }
     ]
     
-    st.markdown("### 오늘은 어떤 이야기를 해볼까요?")
+    st.markdown("### 오늘은 뭘 해볼까요?")
     
-    col1, col2 = st.columns(2)
-    
-    for i, func in enumerate(functions):
-        with col1 if i % 2 == 0 else col2:
+    cols = st.columns(3)
+    for i, choice in enumerate(choices):
+        with cols[i]:
             if st.button(
-                f"{func['icon']} {func['title']}\n{func['desc']}", 
-                key=f"func_{func['mode']}",
+                f"{choice['icon']}\n\n**{choice['title']}**\n\n{choice['desc']}", 
+                key=f"choice_{choice['mode']}",
                 use_container_width=True
             ):
-                st.session_state.current_mode = func['mode']
+                st.session_state.current_mode = choice['mode']
                 st.session_state.conversation_started = True
-                if not st.session_state.mode_messages[func['mode']]:
-                    st.session_state.mode_messages[func['mode']].append({
+                # 모드별 첫 메시지 추가
+                if choice['mode'] == 'chat':
+                    st.session_state.messages.append({
                         "role": "assistant",
-                        "content": func['first_msg']
+                        "content": "반가워요! 😊 오늘 어떤 이야기를 나눠볼까요?\n\n편하게 말씀해주세요. 뭐든 들을 준비가 되어있어요."
+                    })
+                elif choice['mode'] == 'goal':
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": "🎯 목표 설정 모드에요!\n\n요즘 이루고 싶은 게 있나요? 크든 작든 상관없어요.\n\n함께 구체적으로 만들어봐요."
+                    })
+                elif choice['mode'] == 'check':
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": "📊 오늘의 상태 체크!\n\n1부터 10까지 중에서, 오늘 컨디션은 몇 점인 것 같아요?\n\n(1: 최악 ~ 10: 최고)"
                     })
                 st.rerun()
 
+def render_progress_bar(current_step=1, total_steps=3):
+    """진행 상태 표시"""
+    steps_html = ""
+    for i in range(1, total_steps + 1):
+        if i < current_step:
+            steps_html += f'<span class="progress-step done">✓</span>'
+        elif i == current_step:
+            steps_html += f'<span class="progress-step active">{i}</span>'
+        else:
+            steps_html += f'<span class="progress-step">{i}</span>'
+    
+    st.markdown(f"""
+    <div class="progress-container">
+        {steps_html}
+        <span style="margin-left: 1rem; color: #666;">진행 중...</span>
+    </div>
+    """, unsafe_allow_html=True)
+
 def render_chat_interface():
     """채팅 인터페이스 렌더링"""
-    messages = get_current_messages()
-    
-    # 메시지 표시
-    for msg in messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+    # 채팅 히스토리 표시
+    chat_container = st.container()
+    with chat_container:
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; margin: 0.5rem 0;">
+                    <div class="chat-message user-message">{msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-start; margin: 0.5rem 0;">
+                    <div class="chat-message kanbu-message">🤝 {msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
     
     # 입력창
-    if prompt := st.chat_input("지금 마음에 있는 이야기를 해주세요..."):
-        add_message("user", prompt)
+    st.markdown("<br>", unsafe_allow_html=True)
+    user_input = st.chat_input("메시지를 입력하세요...")
+    
+    if user_input:
+        # 사용자 메시지 추가
+        st.session_state.messages.append({"role": "user", "content": user_input})
         
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        # AI 응답 생성
+        with st.spinner("깐부가 생각하는 중..."):
+            response = get_groq_response(st.session_state.messages)
         
-        with st.chat_message("assistant"):
-            with st.spinner("잠시 생각 중..."):
-                response = get_groq_response(get_current_messages())
-                st.markdown(response)
-        
-        add_message("assistant", response)
+        # AI 응답 추가
+        st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🚀 메인 앱
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-def main():
-    st.set_page_config(
-        page_title="KANBU - AI 시대 인생 코치",
-        page_icon="🤝",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-    
-    load_css()
-    init_session_state()
-    
-    # 사이드바
+def render_sidebar():
+    """사이드바 렌더링"""
     with st.sidebar:
         st.markdown("""
-        <div style="text-align: center; padding: 1rem;">
+        <div style="text-align: center; padding: 1.5rem 0;">
             <div style="font-size: 3rem;">🤝</div>
-            <div style="color: #7986CB; font-size: 1.5rem; font-weight: bold;">KANBU</div>
-            <div style="color: #999; font-size: 0.9rem;">판단을 지켜주는 인생 코치</div>
+            <div style="color: #FF8C42; font-size: 1.5rem; font-weight: bold;">깐부</div>
+            <div style="color: #999; font-size: 0.9rem;">KANBU Coach</div>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
         
-        # KANBU 정체성
-        st.markdown("""
-        ### 🛡️ KANBU란?
-        
-        AI 시대의 **인생 코치**입니다.
-        
-        더 빠르게 ❌  
-        더 많이 ❌  
-        **지금 멈춰도 되는지** ⭕
-        """)
-        
-        st.markdown("---")
-        
-        # 핵심 원칙
-        st.markdown("""
-        ### ⚖️ 핵심 원칙
-        
-        ❌ 결론 내려주기  
-        ❌ 정답 제시  
-        ❌ 가속 유도
-        
-        ⭕ 불안 신호 감지  
-        ⭕ 생각 정리 질문  
-        ⭕ 속도 조절 제안
-        """)
-        
-        st.markdown("---")
-        
-        # 현재 모드
+        # 현재 상태
         mode_names = {
             "home": "🏠 홈",
-            "anxiety": "😰 불안 점검",
-            "choice": "🔀 선택 정리",
-            "pace": "🐢 속도 조절",
-            "reflect": "💭 생각 정리",
-            "free": "💬 자유 대화"
+            "chat": "💬 대화 중",
+            "goal": "🎯 목표 설정",
+            "check": "📊 상태 체크"
         }
         current = mode_names.get(st.session_state.current_mode, "🏠 홈")
         st.markdown(f"**현재 모드:** {current}")
+        
+        # 대화 수
+        msg_count = len([m for m in st.session_state.messages if m["role"] == "user"])
+        st.markdown(f"**대화 수:** {msg_count}개")
         
         st.markdown("---")
         
@@ -497,86 +462,75 @@ def main():
         
         if st.button("🏠 처음으로", use_container_width=True):
             st.session_state.current_mode = "home"
+            st.session_state.messages = []
             st.session_state.conversation_started = False
             st.rerun()
         
         if st.button("🗑️ 대화 초기화", use_container_width=True):
-            clear_current_messages()
+            st.session_state.messages = []
             st.rerun()
         
         st.markdown("---")
         
-        # 도움 연락처
+        # 긴급 연락처
         st.markdown("""
-        ### 🆘 도움이 필요할 때
+        ### 🆘 긴급 연락처
         
-        **정신건강위기상담**  
+        **자살예방상담전화**  
+        ☎️ 1393 (24시간)
+        
+        **정신건강위기상담전화**  
         ☎️ 1577-0199
-        
-        **자살예방상담**  
-        ☎️ 1393
-        """)
-        
-        st.markdown("---")
-        
-        # 데이터 보안 안내
-        st.markdown("""
-        ### 🔒 데이터 보안 안내
-        
-        ✅ 개인정보 비저장 원칙  
-        ✅ 상담 기록 익명 처리  
-        ✅ 외부 전송·학습 미사용
-        
-        ---
-        
-        *본 서비스는 사용자의 존엄성과  
-        안전을 보호하기 위해 설계되었으며,  
-        어떠한 대화 데이터도 학습이나  
-        외부 활용에 사용되지 않습니다.*
         """)
         
         st.markdown("---")
         
         # 크레딧
         st.markdown("""
-        <div style="text-align: center; color: #999; font-size: 0.8rem;">
-            <p>Developed by<br>Jameskim + AI Avengers</p>
-            <p>Raira · Gemini · Miracle · Perfect</p>
+        <div style="text-align: center; color: #666; font-size: 0.8rem;">
+            <p>Made with 💛</p>
+            <p>Jameskim + Miracle</p>
+            <p>Design: Raira + Gemini</p>
         </div>
         """, unsafe_allow_html=True)
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🚀 메인 앱
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+def main():
+    st.set_page_config(
+        page_title="깐부 KANBU - AI 코치",
+        page_icon="🤝",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
     
-    # 메인 영역
-    with st.container():
+    # 초기화
+    init_session_state()
+    load_css()
+    
+    # 사이드바
+    render_sidebar()
+    
+    # 메인 컨텐츠
+    col1, col2, col3 = st.columns([1, 3, 1])
+    
+    with col2:
         render_header()
         
         if not st.session_state.conversation_started:
-            # 홈 화면 - 기능 카드
-            render_function_cards()
-            
-            # 철학 박스
-            st.markdown("""
-            <div class="philosophy-box">
-                <div class="philosophy-text">
-                    "AI 시대에 가장 필요한 건 더 빠른 학습이 아니라<br>
-                    멈출 수 있는 판단력이다."
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            # 홈 화면 - 선택 카드
+            render_choice_cards()
             
             # 환영 메시지
-            st.markdown(f"""
-            <div style="text-align: center; margin-top: 1.5rem; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <h3 style="color: {COLORS['text']};">👋 안녕하세요!</h3>
+            st.markdown("""
+            <div style="text-align: center; margin-top: 2rem; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="color: #2C2C2C;">👋 안녕하세요!</h3>
                 <p style="color: #666; line-height: 1.8;">
-                    저는 <strong style="color: {COLORS['main']};">KANBU</strong>예요.<br>
-                    AI 시대의 인생 코치죠.<br><br>
-                    더 빨리 하라고 재촉하지 않아요.<br>
-                    <strong>지금 멈춰도 괜찮은지</strong> 함께 생각해요.<br><br>
-                    오늘, 무슨 이야기를 해볼까요?
-                </p>
-                <p style="color: #999; font-size: 0.85rem; margin-top: 1rem;">
-                    💡 KANBU는 결정하지 않고, 판단하지 않고, 재촉하지 않습니다.<br>
-                    생각을 정리하고, 불안을 점검하고, 속도를 조절해요.
+                    저는 <strong style="color: #FF8C42;">깐부</strong>예요.<br>
+                    현실적이지만 따뜻한 당신의 AI 코치입니다.<br><br>
+                    위로만 하는 게 아니라, 진짜 도움이 되는 대화를 해요.<br>
+                    같이 이야기 나눠볼까요?
                 </p>
             </div>
             """, unsafe_allow_html=True)
@@ -587,8 +541,8 @@ def main():
         # 푸터
         st.markdown("""
         <div class="kanbu-footer">
-            <p>🤝 KANBU v1.0</p>
-            <p>AI 시대, 판단을 지켜주는 인생 코치</p>
+            <p>🤝 깐부 KANBU v1.0</p>
+            <p>현실적 따뜻함으로 함께하는 AI 코치</p>
         </div>
         """, unsafe_allow_html=True)
 
