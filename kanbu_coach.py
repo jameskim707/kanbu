@@ -321,6 +321,22 @@ def clear_current_messages():
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 🤖 Groq API 연결
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import re
+
+def filter_foreign_chars(text):
+    """한자, 일본어 등 외국어 문자 필터링"""
+    # 한자 제거 (CJK Unified Ideographs)
+    text = re.sub(r'[\u4e00-\u9fff]', '', text)
+    # 일본어 히라가나 제거
+    text = re.sub(r'[\u3040-\u309f]', '', text)
+    # 일본어 가타카나 제거
+    text = re.sub(r'[\u30a0-\u30ff]', '', text)
+    # 태국어 제거
+    text = re.sub(r'[\u0e00-\u0e7f]', '', text)
+    # 연속 공백 정리
+    text = re.sub(r' +', ' ', text)
+    return text.strip()
+
 def get_groq_response(messages):
     """Groq API를 통해 응답 생성"""
     try:
@@ -336,7 +352,10 @@ def get_groq_response(messages):
             max_tokens=1024,
         )
         
-        return response.choices[0].message.content
+        result = response.choices[0].message.content
+        # 외국어 문자 필터링
+        result = filter_foreign_chars(result)
+        return result
     except Exception as e:
         return f"🤝 ⚠️ 연결에 문제가 생겼어요. 잠시 후 다시 시도해주세요.\n\n(오류: {str(e)})"
 
