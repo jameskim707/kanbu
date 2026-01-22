@@ -6,7 +6,7 @@
 2. 응답 스타일 랜덤화 (3가지 버전)
 3. UI 색상 대비 강화
 4. 진행 단계 시각화
-5. 대화창 테두리 추가 (명확한 구분)
+5. 대화창 테두리 수정 (올바른 구조)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -197,7 +197,7 @@ STAGE_PROMPTS = {
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🎨 CSS 스타일 (대화창 테두리 추가)
+# 🎨 CSS 스타일
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def load_css():
     st.markdown(f"""
@@ -243,17 +243,6 @@ def load_css():
             box-shadow: 0 4px 12px rgba(92, 107, 192, 0.15);
         }}
         
-        /* 대화창 전체 컨테이너 - 테두리 추가 */
-        .chat-container {{
-            background: {COLORS['white']};
-            border: 1px solid {COLORS['border']};
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            min-height: 500px;
-        }}
-        
         .chat-message {{
             padding: 1rem 1.5rem;
             border-radius: 18px;
@@ -286,10 +275,13 @@ def load_css():
             border: 2px solid {COLORS['accent']};
         }}
         
-        /* Streamlit 채팅 입력창 스타일링 */
-        .stChatInput {{
-            border-top: 1px solid {COLORS['border']} !important;
-            padding-top: 1rem !important;
+        /* Streamlit 채팅 컨테이너에 테두리 */
+        [data-testid="stChatMessageContainer"] {{
+            border: 1px solid {COLORS['border']};
+            border-radius: 16px;
+            padding: 1rem;
+            background: white;
+            margin: 1rem 0;
         }}
         
         #MainMenu {{visibility: hidden;}}
@@ -441,9 +433,6 @@ def render_function_cards():
 def render_chat_interface():
     messages = get_current_messages()
     
-    # 대화창 컨테이너 시작
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    
     # 진행 단계 표시
     stage = get_conversation_stage(messages)
     stage_names = {
@@ -463,9 +452,6 @@ def render_chat_interface():
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    # 대화창 컨테이너 종료
     
     # 입력창
     if prompt := st.chat_input("지금 마음에 있는 이야기를 해주세요..."):
